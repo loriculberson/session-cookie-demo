@@ -2,14 +2,12 @@ const express = require('express');
 const session = require('express-session');
 const cookieParser = require("cookie-parser");
 const path = require('path');
-
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 const oneDay = 1000 * 60 * 60 * 24;
-
 const sess = {
   secret: process.env.SESSION_SECRET,
   cookie: {
@@ -24,16 +22,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-//serving public file
 app.use(express.static('public'));
 
-//username and password
-const myusername = 'user1'
+//username and password for demo purposes
+const myusername = 'User1'
 const mypassword = 'Password1'
 
-// a variable to save a session
 app.get('/', (req,res) => {
-  console.log('GET /', req.session)
+  console.log('GET', req.session)
+  console.log('*******************')
+  console.log('GET', req.cookies)
 
   if(req.session.userid){
       res.send("Welcome User <a href=\'/logout'>click to logout</a>");
@@ -43,11 +41,12 @@ app.get('/', (req,res) => {
 });
 
 app.post('/user',(req,res) => {
-  console.log('POST /', req.session)
-
+  console.log('/user SESSION', req.session)
+  console.log('*******************')
+  console.log('/user COOKIE', req.cookies)
   if(req.body.username == myusername && req.body.password == mypassword){
       req.session.userid = req.body.username;
-      console.log('POST inside', req.session)
+      console.log('/user SESSION inside', req.session)
       res.send(`Hey there, welcome <a href=\'/logout'>click to logout</a>`);
   } else {
       res.send('Invalid username or password');
@@ -56,7 +55,10 @@ app.post('/user',(req,res) => {
 
 app.get('/logout',(req,res) => {
   req.session.destroy();
-  console.log('LOGOUT', req.session)
+  console.log('/logout SESSION', req.session)
+  console.log('*******************')
+  console.log('/logout COOKIES', req.cookies)
+
   res.redirect('/');
 });
 
