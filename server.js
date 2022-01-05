@@ -1,6 +1,5 @@
 const express = require('express');
 const session = require('express-session');
-const cookieParser = require("cookie-parser");
 const path = require('path');
 require('dotenv').config();
 
@@ -20,7 +19,6 @@ const sess = {
 app.use(session(sess));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
 
 app.use(express.static('public'));
 
@@ -31,7 +29,7 @@ const mypassword = 'Password1'
 app.get('/', (req,res) => {
   console.log('GET', req.session)
   console.log('*******************')
-  console.log('GET', req.cookies)
+  console.log('GET SESSION ID',  req.session.id)
 
   if(req.session.userid){
       res.send("Welcome User <a href=\'/logout'>click to logout</a>");
@@ -43,7 +41,7 @@ app.get('/', (req,res) => {
 app.post('/user',(req,res) => {
   console.log('/user SESSION', req.session)
   console.log('*******************')
-  console.log('/user COOKIE', req.cookies)
+  console.log('/user SESSION ID',  req.session.id)
   if(req.body.username == myusername && req.body.password == mypassword){
       req.session.userid = req.body.username;
       console.log('/user SESSION inside', req.session)
@@ -56,8 +54,6 @@ app.post('/user',(req,res) => {
 app.get('/logout',(req,res) => {
   req.session.destroy();
   console.log('/logout SESSION', req.session)
-  console.log('*******************')
-  console.log('/logout COOKIES', req.cookies)
 
   res.redirect('/');
 });
