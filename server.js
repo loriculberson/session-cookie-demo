@@ -2,7 +2,7 @@ const express = require('express');
 const session = require('express-session');
 const path = require('path');
 require('dotenv').config();
-
+// Resource: https://github.com/expressjs/session
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -26,6 +26,13 @@ app.use(express.static('public'));
 const myusername = 'User1'
 const mypassword = 'Password1'
 
+const isAuth = (req, res, next) => {
+  if (req.session.isAuth) {
+    next()
+  } else {
+    res.redirect('/user')
+  }
+}
 app.get('/', (req,res) => {
   console.log('GET', req.session)
   console.log('*******************')
@@ -38,12 +45,19 @@ app.get('/', (req,res) => {
   }
 });
 
+app.get('/dashboard', isAuth, (req, res) => {
+  console.log('GET', req.session)
+
+  res.sendFile(path.join(__dirname, '/public/secret.html'))
+});
+
 app.post('/user',(req,res) => {
   console.log('/user SESSION', req.session)
   console.log('*******************')
   console.log('/user SESSION ID',  req.session.id)
   if(req.body.username == myusername && req.body.password == mypassword){
       req.session.userid = req.body.username;
+      req.session.isAuth = true
       console.log('/user SESSION inside', req.session)
       res.send(`Hey there, welcome <a href=\'/logout'>click to logout</a>`);
   } else {
